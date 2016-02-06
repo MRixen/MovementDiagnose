@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
+
+    <!--<item-->
+        <!--android:id="@+id/popup_properties"-->
+        <!--android:title="@string/title_activity_settings"-->
+        <!--android:orderInCategory="100"-->
+        <!--app:showAsAction="never"/>-->
+
+    <item
+        android:id="@+id/popup_about"
+        android:title="@string/title_activity_about" />
+
+    <!--<item-->
+        <!--android:id="@+id/popup_help"-->
+        <!--android:title="@string/title_activity_help" />-->
+</menu>

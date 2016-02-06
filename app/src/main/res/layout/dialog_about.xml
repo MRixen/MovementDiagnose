@@ -1,0 +1,71 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="5dp">
+    <TextView
+        android:id="@+id/authorHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:text="Author:"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"/>
+
+    <TextView
+        android:id="@+id/author"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="M. Rixen"
+        android:layout_toRightOf="@id/authorHeader"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"/>
+
+    <TextView
+        android:id="@+id/helpHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:text="Ref. projects:"
+        android:layout_below="@id/authorHeader"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"/>
+
+    <TextView
+        android:id="@+id/helpers"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Fast Diagnose"
+        android:layout_below="@id/author"
+        android:layout_toRightOf="@id/helpHeader"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"/>
+
+
+    <TextView
+        android:id="@+id/usageHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:layout_below="@id/helpers"
+        android:text="Usage:"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"/>
+
+    <TextView
+        android:id="@+id/usage"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Acquire movement data of a human."
+        android:layout_below="@id/helpers"
+        android:layout_toRightOf="@id/usageHeader"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"/>
+</RelativeLayout>
+</FrameLayout>

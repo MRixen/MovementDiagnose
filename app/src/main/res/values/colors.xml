@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="ModernRed">#f25b47</color>
+    <color name="ModernBlue">#6699cc</color>
+    <color name="GreyLight">#ffcecece</color>
+    <color name="ModernWhite">#fbfbec</color>
+    <color name="ModernGreen">#99cc66</color>
+    <color name="ModernOrange">#f99d1c</color>
+    <color name="White">#FFFFFF</color>
+    <color name="ModernBlueTransparency">#ffffff</color>
+    <color name="GreyDark">#FF8E8C8C</color>
+    <color name="Black">#000000</color>
+    <color name="Red">#ffff0000</color>
 </resources>
