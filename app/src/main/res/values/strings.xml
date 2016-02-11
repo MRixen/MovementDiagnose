@@ -14,8 +14,8 @@
     <string name="title_activity_barcodereading">DataGui</string>
     <string name="title_section4">Events</string>
     <string name="title_activity_about">About</string>
-    <string name="errMsgWlan">Please connect to robot controller via WLan</string>
-    <string name="connectionError">Can\'t connect to robot controller. Check WLan connection</string>
+    <string name="errMsgWlan">Please connect to server via WLan</string>
+    <string name="connectionError">Can\'t connect to server. Check WLan connection</string>
     <string name="startRegListenerError">Error while trying to register to listener.</string>
     <string name="startRegListenerSuccess">Register to listener successfully.</string>
 </resources>
