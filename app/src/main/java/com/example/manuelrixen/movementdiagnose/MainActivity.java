@@ -3,13 +3,17 @@ package com.example.manuelrixen.movementdiagnose;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +27,13 @@ import com.example.manuelrixen.movementdiagnose.Dialogs.CustomDecisionDialog;
 import com.example.manuelrixen.movementdiagnose.Dialogs.CustomInputDialog;
 import com.example.manuelrixen.movementdiagnose.Socket.Receiver;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -46,10 +57,13 @@ public class MainActivity extends Activity implements Receiver.EventListener, Vi
     private boolean setConnectionDataManually = false;
     private EditText ipField, portField;
     private TextView connectToField;
+    private File currentDirectory;
+    private String currentfilename;
 
-    private TextView x_textView;
-    private TextView y_textView;
-    private TextView z_textView;
+    private TextView ID_1_x_textView, ID_1_y_textView, ID_1_z_textView;
+    private TextView ID_2_x_textView, ID_2_y_textView, ID_2_z_textView;
+    private TextView ID_3_x_textView, ID_3_y_textView, ID_3_z_textView;
+    private TextView ID_4_x_textView, ID_4_y_textView, ID_4_z_textView;
     private Receiver receiver;
 
 
@@ -68,6 +82,21 @@ public class MainActivity extends Activity implements Receiver.EventListener, Vi
                 | ActionBar.DISPLAY_SHOW_HOME);
 
         connectToField = (TextView) actionBar.getCustomView().findViewById(R.id.connectTo);
+        ID_1_x_textView = (TextView) findViewById(R.id.ID_1_x_value);
+        ID_1_y_textView = (TextView) findViewById(R.id.ID_1_y_value);
+        ID_1_z_textView = (TextView) findViewById(R.id.ID_1_z_value);
+
+        ID_2_x_textView = (TextView) findViewById(R.id.ID_2_x_value);
+        ID_2_y_textView = (TextView) findViewById(R.id.ID_2_y_value);
+        ID_2_z_textView = (TextView) findViewById(R.id.ID_2_z_value);
+
+        ID_3_x_textView = (TextView) findViewById(R.id.ID_3_x_value);
+        ID_3_y_textView = (TextView) findViewById(R.id.ID_3_y_value);
+        ID_3_z_textView = (TextView) findViewById(R.id.ID_3_z_value);
+
+        ID_4_x_textView = (TextView) findViewById(R.id.ID_4_x_value);
+        ID_4_y_textView = (TextView) findViewById(R.id.ID_4_y_value);
+        ID_4_z_textView = (TextView) findViewById(R.id.ID_4_z_value);
 
         baseData = new BaseData(this, this);
 
@@ -115,7 +144,13 @@ public class MainActivity extends Activity implements Receiver.EventListener, Vi
 
         else {
             if (firstStart) {
+                setConnectionDataManually = true;
+                showDialogForManuallyInput();
                 firstStart = false;
+            }
+            else{
+                setConnectionDataManually = true;
+                showDialogForManuallyInput();
             }
         }
 
@@ -233,20 +268,61 @@ public class MainActivity extends Activity implements Receiver.EventListener, Vi
 
     @Override
     public void onError() {
-        x_textView.setText("error");
-        y_textView.setText("error");
-        z_textView.setText("error");
+        ID_1_x_textView.setText(getResources().getString(R.string.x_value) + "error");
+        ID_1_y_textView.setText(getResources().getString(R.string.y_value) + "error");
+        ID_1_z_textView.setText(getResources().getString(R.string.z_value) + "error");
+
+        ID_2_x_textView.setText(getResources().getString(R.string.x_value) + "error");
+        ID_2_y_textView.setText(getResources().getString(R.string.y_value) + "error");
+        ID_2_z_textView.setText(getResources().getString(R.string.z_value) + "error");
+
+        ID_3_x_textView.setText(getResources().getString(R.string.x_value) + "error");
+        ID_3_y_textView.setText(getResources().getString(R.string.y_value) + "error");
+        ID_3_z_textView.setText(getResources().getString(R.string.z_value) + "error");
+
+        ID_4_x_textView.setText(getResources().getString(R.string.x_value) + "error");
+        ID_4_y_textView.setText(getResources().getString(R.string.y_value) + "error");
+        ID_4_z_textView.setText(getResources().getString(R.string.z_value) + "error");
     }
 
     @Override
     public void onEvent(String msgType, String msg) {
-        showMessage(msgType, msg);
+        msg = msg.replace("x","");
+        msg = msg.replace("y","");
+        msg = msg.replace("z","");
+        String[] tempMessage = msg.split(":");
+
+        // Write data to file like this: id;x;y;z
+        String filename = generateFilename();
+        writeToFile(filename, msgType + ";" + tempMessage[0] + ";" + tempMessage[1] + ";" + tempMessage[2]);
+
+        showMessage(msgType, tempMessage);
     }
 
-    private void showMessage(String msgType, String msg) {
-        x_textView.setText(msg);
-        y_textView.setText(msg);
-        z_textView.setText(msg);
+    private void showMessage(String msgType, String[] msg) {
+        if (msgType.equals("1")) {
+            ID_1_x_textView.setText(getResources().getString(R.string.x_value) + " " + msg[0]);
+            ID_1_y_textView.setText(getResources().getString(R.string.y_value) + " " + msg[1]);
+            ID_1_z_textView.setText(getResources().getString(R.string.z_value) + " " + msg[2]);
+        }
+
+        if (msgType.equals("2")){
+            ID_2_x_textView.setText(getResources().getString(R.string.x_value) + " " + msg[0]);
+            ID_2_y_textView.setText(getResources().getString(R.string.y_value) + " " + msg[1]);
+            ID_2_z_textView.setText(getResources().getString(R.string.z_value) + " " + msg[2]);
+        }
+
+        if (msgType.equals("3")){
+            ID_3_x_textView.setText(getResources().getString(R.string.x_value) + " " + msg[0]);
+            ID_3_y_textView.setText(getResources().getString(R.string.y_value) + " " + msg[1]);
+            ID_3_z_textView.setText(getResources().getString(R.string.z_value) + " " + msg[2]);
+        }
+
+        if (msgType.equals("4")){
+            ID_4_x_textView.setText(getResources().getString(R.string.x_value) + " " + msg[0]);
+            ID_4_y_textView.setText(getResources().getString(R.string.y_value) + " " + msg[1]);
+            ID_4_z_textView.setText(getResources().getString(R.string.z_value) + " " + msg[2]);
+        }
     }
 
     @Override
@@ -262,4 +338,76 @@ public class MainActivity extends Activity implements Receiver.EventListener, Vi
             }
         }
     }
+
+    private void writeToFile(String filename, String data) {
+        // Create internal directory
+        File directoryName = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        currentDirectory = directoryName;
+        currentfilename = filename;
+
+        File file = new File(directoryName, filename);
+        try {
+            if (!file.exists()){
+                file.createNewFile();
+                writing(file, "Context;Durance", false);
+                Log.d("time_date", "createNewFile");
+            }
+
+            writing(file, data, true);
+
+        } catch (IOException e) {
+            Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void writing(File file, String data, boolean showSaveState) {
+        FileOutputStream fileOutputStream = null;
+        try {
+            fileOutputStream = new FileOutputStream(file, true);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
+            outputStreamWriter.append(data);
+            outputStreamWriter.append("\n\r");
+            outputStreamWriter.close();
+            if (showSaveState) Toast.makeText(getBaseContext(), "Saved", Toast.LENGTH_SHORT).show();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private String generateFilename() {
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        Log.d("time_date", dateFormat.toString());
+        String date = dateFormat.format(calendar.getTime());
+        return date+".txt";
+    }
+
+    public void onSendButtonClicked(View view) {
+
+//        String filelocation="/storage/emulated/0/Download/"+generateFilename();
+//        Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+//                "mailto", "manleo.rixen@gmail.com", null));
+//        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
+//        startActivity(Intent.createChooser(emailIntent, "Send email..."));
+
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_EMAIL, new String[] {"manleo.rixen@gmail.com"});
+        intent.putExtra(Intent.EXTRA_SUBJECT, "subject here");
+        intent.putExtra(Intent.EXTRA_TEXT, "body text");
+        File directoryName = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        File file = new File(directoryName, generateFilename());
+        if (!file.exists() || !file.canRead()) {
+            Toast.makeText(this, "Attachment Error", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+        Uri uri = Uri.parse("file://" + file);
+        intent.putExtra(Intent.EXTRA_STREAM, uri);
+        startActivity(Intent.createChooser(intent, "Send email..."));
+    }
+
 }

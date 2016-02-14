@@ -7,34 +7,176 @@
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
 
     <TextView
-        android:id="@+id/x_value"
-        android:gravity="center_horizontal"
-        android:layout_width="fill_parent"
+        android:id="@+id/ID_1_header"
+        android:gravity="left"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textStyle="bold"
         android:layout_marginTop="50dp"
-        android:text="X: "/>
+        android:text="Sensor ID 1"/>
 
     <TextView
-        android:id="@+id/y_value"
-        android:layout_width="fill_parent"
+        android:id="@+id/ID_1_x_value"
+        android:gravity="left"
+        android:layout_width="70dp"
+        android:layout_marginTop="5dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/x_value"
-        android:gravity="center_horizontal"
-        android:text="Y: "/>
+        android:background="@color/GreyLight"
+        android:layout_below="@id/ID_1_header"
+        android:text="@string/x_value"/>
 
     <TextView
-        android:id="@+id/z_value"
-        android:layout_width="fill_parent"
+        android:id="@+id/ID_1_y_value"
+        android:layout_width="70dp"
+        android:layout_marginTop="5dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/y_value"
-        android:gravity="center_horizontal"
-        android:text="Z: "/>
+        android:background="@color/GreyLight"
+        android:layout_below="@id/ID_1_x_value"
+        android:gravity="left"
+        android:text="@string/y_value"/>
+
+    <TextView
+        android:id="@+id/ID_1_z_value"
+        android:layout_width="70dp"
+        android:layout_marginTop="5dp"
+        android:layout_height="wrap_content"
+        android:background="@color/GreyLight"
+        android:layout_below="@id/ID_1_y_value"
+        android:gravity="left"
+        android:text="@string/z_value"/>
+
+
+
+    <TextView
+        android:id="@+id/ID_2_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:layout_marginTop="50dp"
+        android:layout_alignParentRight="true"
+        android:text="Sensor ID 2"/>
+
+    <TextView
+        android:id="@+id/ID_2_x_value"
+        android:layout_alignParentRight="true"
+        android:layout_width="70dp"
+        android:layout_below="@id/ID_2_header"
+        android:background="@color/GreyLight"
+        android:layout_height="wrap_content"
+        android:text="@string/x_value"/>
+
+    <TextView
+        android:id="@+id/ID_2_y_value"
+        android:layout_width="70dp"
+        android:layout_marginTop="5dp"
+        android:layout_height="wrap_content"
+        android:background="@color/GreyLight"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/ID_2_x_value"
+        android:text="@string/y_value"/>
+
+    <TextView
+        android:id="@+id/ID_2_z_value"
+        android:layout_width="70dp"
+        android:layout_marginTop="5dp"
+        android:layout_height="wrap_content"
+        android:background="@color/GreyLight"
+        android:layout_below="@id/ID_2_y_value"
+        android:layout_alignParentRight="true"
+        android:text="@string/z_value"/>
+
+    <TextView
+        android:id="@+id/ID_3_header"
+        android:gravity="left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:layout_below="@id/ID_1_z_value"
+        android:layout_marginTop="50dp"
+        android:text="Sensor ID 3"/>
+
+    <TextView
+        android:id="@+id/ID_3_x_value"
+        android:layout_width="70dp"
+        android:layout_marginTop="5dp"
+        android:layout_height="wrap_content"
+        android:background="@color/GreyLight"
+        android:layout_below="@id/ID_3_header"
+        android:text="@string/x_value"/>
+
+    <TextView
+        android:id="@+id/ID_3_y_value"
+        android:layout_width="70dp"
+        android:layout_marginTop="5dp"
+        android:layout_height="wrap_content"
+        android:background="@color/GreyLight"
+        android:layout_below="@id/ID_3_x_value"
+        android:gravity="left"
+        android:text="@string/y_value"/>
+
+    <TextView
+        android:id="@+id/ID_3_z_value"
+        android:layout_width="70dp"
+        android:layout_marginTop="5dp"
+        android:layout_height="wrap_content"
+        android:background="@color/GreyLight"
+        android:layout_below="@id/ID_3_y_value"
+        android:gravity="left"
+        android:text="@string/z_value"/>
+
+
+
+
+
+    <TextView
+        android:id="@+id/ID_4_header"
+        android:gravity="left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:layout_marginTop="55dp"
+        android:layout_below="@id/ID_2_z_value"
+        android:layout_alignParentRight="true"
+        android:text="Sensor ID 4"/>
+
+    <TextView
+        android:id="@+id/ID_4_x_value"
+        android:layout_width="70dp"
+        android:layout_marginTop="5dp"
+        android:layout_height="wrap_content"
+        android:background="@color/GreyLight"
+        android:layout_below="@id/ID_4_header"
+        android:layout_alignParentRight="true"
+        android:text="@string/x_value"/>
+
+    <TextView
+        android:id="@+id/ID_4_y_value"
+        android:layout_width="70dp"
+        android:layout_marginTop="5dp"
+        android:layout_height="wrap_content"
+        android:background="@color/GreyLight"
+        android:layout_below="@id/ID_4_x_value"
+        android:layout_alignParentRight="true"
+        android:gravity="left"
+        android:text="@string/y_value"/>
+
+    <TextView
+        android:id="@+id/ID_4_z_value"
+        android:layout_width="70dp"
+        android:layout_marginTop="5dp"
+        android:layout_height="wrap_content"
+        android:background="@color/GreyLight"
+        android:layout_below="@id/ID_4_y_value"
+        android:layout_alignParentRight="true"
+        android:gravity="left"
+        android:text="@string/z_value"/>
 
     <Button
         android:layout_width="@dimen/buttonSize"
         android:layout_height="wrap_content"
         android:id="@+id/startButton"
-        android:text="Start receiving"
+        android:text="Start listening"
+        android:onClick="onClick"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"/>
 </RelativeLayout>

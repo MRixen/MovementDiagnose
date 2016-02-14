@@ -18,4 +18,7 @@
     <string name="connectionError">Can\'t connect to server. Check WLan connection</string>
     <string name="startRegListenerError">Error while trying to register to listener.</string>
     <string name="startRegListenerSuccess">Register to listener successfully.</string>
+    <string name="x_value">X:</string>
+    <string name="y_value">Y:</string>
+    <string name="z_value">Z:</string>
 </resources>
