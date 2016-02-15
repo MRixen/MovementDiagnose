@@ -38,7 +38,7 @@ public class Receiver implements Runnable {
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(context, "Connected to ip " + ip + " and port " + port, Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "Connected to ip " + ip + " and port " + port, Toast.LENGTH_SHORT).show();
                 }
             });
             // Send client name to server
@@ -56,8 +56,8 @@ public class Receiver implements Runnable {
                         @Override
                         public void run() {
                             try {
-                                for (EventListener eventListener : listeners)
-                                    eventListener.onEvent(data[1], data[0]);
+                                    for (EventListener eventListener : listeners)
+                                        eventListener.onEvent(data[1], data[0]);
                             } catch (NullPointerException e) {
                                 Log.d("Exception:run", String.valueOf(e));
                             }

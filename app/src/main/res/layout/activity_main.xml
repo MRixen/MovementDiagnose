@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textStyle="bold"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="5dp"
         android:text="Sensor ID 1"/>
 
     <TextView
@@ -52,7 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textStyle="bold"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="5dp"
         android:layout_alignParentRight="true"
         android:text="Sensor ID 2"/>
 
@@ -92,7 +92,7 @@
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:layout_below="@id/ID_1_z_value"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="20dp"
         android:text="Sensor ID 3"/>
 
     <TextView
@@ -134,7 +134,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textStyle="bold"
-        android:layout_marginTop="55dp"
+        android:layout_marginTop="20dp"
         android:layout_below="@id/ID_2_z_value"
         android:layout_alignParentRight="true"
         android:text="Sensor ID 4"/>
@@ -171,12 +171,32 @@
         android:gravity="left"
         android:text="@string/z_value"/>
 
+
+
     <Button
-        android:layout_width="@dimen/buttonSize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/sendButton"
+        android:text="Send"
+        android:onClick="onSendButtonClicked"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"/>
+
+    <Spinner
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner"
+        android:layout_above="@id/sendButton"
+        android:background="@color/GreyLight"
+        android:layout_marginBottom="20dp"/>
+
+    <Button
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/startButton"
-        android:text="Start listening"
-        android:onClick="onClick"
+        android:contentDescription="Test"
+        android:text="Start"
+        android:onClick="onStartButtonClick"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"/>
 </RelativeLayout>

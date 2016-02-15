@@ -17,7 +17,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,13 +36,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import static android.os.Process.myPid;
 
-public class MainActivity extends Activity implements Receiver.EventListener, View.OnClickListener {
+public class MainActivity extends Activity implements Receiver.EventListener {
 
     private final long maxActivityShowTime = 3000;
     private PowerManager.WakeLock wl;
@@ -66,6 +70,17 @@ public class MainActivity extends Activity implements Receiver.EventListener, Vi
     private TextView ID_4_x_textView, ID_4_y_textView, ID_4_z_textView;
     private Receiver receiver;
 
+    // Spinner data
+    private boolean firstStartFinished = false;
+    private ArrayAdapter<String> adapter;
+    private ArrayList<String> eventList;
+    private Object item;
+    private String fileName = "invalid";
+    private boolean stopWritingToFile = false;
+    private Spinner spinner;
+    private String[] fileNameArray_rightLeg = new String[4];
+    private int cntr = 0;
+
 
     // TODO Check why zonenbahn-fehler isnt shown as event
 
@@ -80,8 +95,32 @@ public class MainActivity extends Activity implements Receiver.EventListener, Vi
 
         actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM
                 | ActionBar.DISPLAY_SHOW_HOME);
-
         connectToField = (TextView) actionBar.getCustomView().findViewById(R.id.connectTo);
+
+        initTextFields();
+
+        initSpinner();
+
+        baseData = new BaseData(this, this);
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        customDecisionDialog = new CustomDecisionDialog(this);
+        customDecisionDialog.setCancelable(false);
+        customInputDialog = new CustomInputDialog(this, this);
+        customInputDialog.setCancelable(false);
+
+        customAboutDialog = new CustomAboutDialog(this);
+
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
+        wl.acquire();
+
+        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+
+    }
+
+    private void initTextFields() {
         ID_1_x_textView = (TextView) findViewById(R.id.ID_1_x_value);
         ID_1_y_textView = (TextView) findViewById(R.id.ID_1_y_value);
         ID_1_z_textView = (TextView) findViewById(R.id.ID_1_z_value);
@@ -97,22 +136,39 @@ public class MainActivity extends Activity implements Receiver.EventListener, Vi
         ID_4_x_textView = (TextView) findViewById(R.id.ID_4_x_value);
         ID_4_y_textView = (TextView) findViewById(R.id.ID_4_y_value);
         ID_4_z_textView = (TextView) findViewById(R.id.ID_4_z_value);
+    }
 
-        baseData = new BaseData(this, this);
+    private void initSpinner() {
+        spinner = (Spinner)findViewById(R.id.spinner);
+        eventList = new ArrayList<>();
+        adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_list_item_1,
+                eventList);
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        customDecisionDialog = new CustomDecisionDialog(this);
-        customInputDialog = new CustomInputDialog(this, this);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                    if (parent.getSelectedItem().toString().equals(parent.getItemAtPosition(0))) {
+                        for (int i = 1; i <= 4; i++) {
+                            fileNameArray_rightLeg[i - 1] = generateFilename(String.valueOf(i));
+                            Log.d("fileNameArray_rightLeg[" + (i - 1) + "]", fileNameArray_rightLeg[i - 1]);
+                        }
+                    }
+            }
 
-        customAboutDialog = new CustomAboutDialog(this);
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
 
-        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
-        wl.acquire();
 
-        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        // Add items
+        eventList.add(0, "Right_leg");
+        eventList.add(1, "");
 
+        spinner.setSelection(1);
+
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -148,14 +204,10 @@ public class MainActivity extends Activity implements Receiver.EventListener, Vi
                 showDialogForManuallyInput();
                 firstStart = false;
             }
-            else{
-                setConnectionDataManually = true;
-                showDialogForManuallyInput();
-            }
         }
 
         if (!mWifi.isConnected()) {
-            Toast.makeText(this, R.string.errMsgWlan, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.errMsgWlan, Toast.LENGTH_SHORT).show();
             Timer t = new Timer();
             t.schedule(new TimerTask() {
                 @Override
@@ -188,9 +240,10 @@ public class MainActivity extends Activity implements Receiver.EventListener, Vi
             }, new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // Cancel manually input and show barcode reader
+                    // Cancel manually input and close app
                     useLastConnection = false;
                     customInputDialog.dismiss();
+                    finish();
                 }
             });
         }
@@ -292,10 +345,6 @@ public class MainActivity extends Activity implements Receiver.EventListener, Vi
         msg = msg.replace("z","");
         String[] tempMessage = msg.split(":");
 
-        // Write data to file like this: id;x;y;z
-        String filename = generateFilename();
-        writeToFile(filename, msgType + ";" + tempMessage[0] + ";" + tempMessage[1] + ";" + tempMessage[2]);
-
         showMessage(msgType, tempMessage);
     }
 
@@ -304,39 +353,49 @@ public class MainActivity extends Activity implements Receiver.EventListener, Vi
             ID_1_x_textView.setText(getResources().getString(R.string.x_value) + " " + msg[0]);
             ID_1_y_textView.setText(getResources().getString(R.string.y_value) + " " + msg[1]);
             ID_1_z_textView.setText(getResources().getString(R.string.z_value) + " " + msg[2]);
+            // Write data to file like this: id;x;y;z
+            if (!stopWritingToFile) writeToFile(fileNameArray_rightLeg[0], msgType + ";" + msg[0] + ";" + msg[1] + ";" + msg[2]);
         }
 
         if (msgType.equals("2")){
             ID_2_x_textView.setText(getResources().getString(R.string.x_value) + " " + msg[0]);
             ID_2_y_textView.setText(getResources().getString(R.string.y_value) + " " + msg[1]);
             ID_2_z_textView.setText(getResources().getString(R.string.z_value) + " " + msg[2]);
+            // Write data to file like this: id;x;y;z
+            if (!stopWritingToFile) writeToFile(fileNameArray_rightLeg[1], msgType + ";" + msg[0] + ";" + msg[1] + ";" + msg[2]);
         }
 
         if (msgType.equals("3")){
             ID_3_x_textView.setText(getResources().getString(R.string.x_value) + " " + msg[0]);
             ID_3_y_textView.setText(getResources().getString(R.string.y_value) + " " + msg[1]);
             ID_3_z_textView.setText(getResources().getString(R.string.z_value) + " " + msg[2]);
+            // Write data to file like this: id;x;y;z
+            if (!stopWritingToFile) writeToFile(fileNameArray_rightLeg[2], msgType + ";" + msg[0] + ";" + msg[1] + ";" + msg[2]);
         }
 
         if (msgType.equals("4")){
             ID_4_x_textView.setText(getResources().getString(R.string.x_value) + " " + msg[0]);
             ID_4_y_textView.setText(getResources().getString(R.string.y_value) + " " + msg[1]);
             ID_4_z_textView.setText(getResources().getString(R.string.z_value) + " " + msg[2]);
+            // Write data to file like this: id;x;y;z
+            if (!stopWritingToFile) writeToFile(fileNameArray_rightLeg[3], msgType + ";" + msg[0] + ";" + msg[1] + ";" + msg[2]);
         }
     }
 
-    @Override
-    public void onClick(View v) {
-        // Start registering to listener
-        if (receiver == null) {
-            try {
-                receiver = baseData.getReceiver();
-                receiver.registerListener(this);
-                Toast.makeText(this, R.string.startRegListenerSuccess, Toast.LENGTH_LONG).show();
-            } catch (NullPointerException e) {
-                Toast.makeText(this, R.string.startRegListenerError, Toast.LENGTH_LONG).show();
+    public void onStartButtonClick(View v) {
+        if (spinner.getSelectedItem().toString().equals(spinner.getItemAtPosition(0))) {
+            // Start registering to listener
+            if (receiver == null) {
+                try {
+                    receiver = baseData.getReceiver();
+                    receiver.registerListener(this);
+                    Toast.makeText(this, R.string.startRegListenerSuccess, Toast.LENGTH_SHORT).show();
+                } catch (NullPointerException e) {
+                    Toast.makeText(this, R.string.startRegListenerError, Toast.LENGTH_SHORT).show();
+                }
             }
         }
+        else Toast.makeText(getBaseContext(), "Select context from spinner!", Toast.LENGTH_SHORT).show();
     }
 
     private void writeToFile(String filename, String data) {
@@ -349,18 +408,18 @@ public class MainActivity extends Activity implements Receiver.EventListener, Vi
         try {
             if (!file.exists()){
                 file.createNewFile();
-                writing(file, "Context;Durance", false);
-                Log.d("time_date", "createNewFile");
+                writing(file, "ID;X;Y;Z");
+                Log.d("writeToFile()", "createNewFile");
             }
 
-            writing(file, data, true);
+            writing(file, data);
 
         } catch (IOException e) {
             Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
-    private void writing(File file, String data, boolean showSaveState) {
+    private void writing(File file, String data) {
         FileOutputStream fileOutputStream = null;
         try {
             fileOutputStream = new FileOutputStream(file, true);
@@ -368,7 +427,6 @@ public class MainActivity extends Activity implements Receiver.EventListener, Vi
             outputStreamWriter.append(data);
             outputStreamWriter.append("\n\r");
             outputStreamWriter.close();
-            if (showSaveState) Toast.makeText(getBaseContext(), "Saved", Toast.LENGTH_SHORT).show();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -377,36 +435,61 @@ public class MainActivity extends Activity implements Receiver.EventListener, Vi
 
     }
 
-    private String generateFilename() {
+    private String generateFilename(String idName) {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-        Log.d("time_date", dateFormat.toString());
         String date = dateFormat.format(calendar.getTime());
-        return date+".txt";
+        return spinner.getSelectedItem().toString() + "_" + idName + "_" + date + ".txt";
     }
 
     public void onSendButtonClicked(View view) {
+        stopWritingToFile = true;
+        sendMultipleAttachments();
+        stopWritingToFile= false;
+    }
 
-//        String filelocation="/storage/emulated/0/Download/"+generateFilename();
-//        Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-//                "mailto", "manleo.rixen@gmail.com", null));
-//        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
-//        startActivity(Intent.createChooser(emailIntent, "Send email..."));
-
+    private void sendSingleAttachment() {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
         intent.putExtra(Intent.EXTRA_EMAIL, new String[] {"manleo.rixen@gmail.com"});
-        intent.putExtra(Intent.EXTRA_SUBJECT, "subject here");
-        intent.putExtra(Intent.EXTRA_TEXT, "body text");
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Movement Diagnose: " + spinner.getSelectedItem());
+        intent.putExtra(Intent.EXTRA_TEXT, "The movement data for " + spinner.getSelectedItem() + " is added as attachment.");
+
         File directoryName = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        File file = new File(directoryName, generateFilename());
+        File file = new File(directoryName, generateFilename("1"));
         if (!file.exists() || !file.canRead()) {
             Toast.makeText(this, "Attachment Error", Toast.LENGTH_SHORT).show();
-            finish();
             return;
         }
         Uri uri = Uri.parse("file://" + file);
         intent.putExtra(Intent.EXTRA_STREAM, uri);
+        startActivity(Intent.createChooser(intent, "Send email..."));
+    }
+
+    private void sendMultipleAttachments(){
+        Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+        intent.setType("plain/text");
+        intent.putExtra(Intent.EXTRA_EMAIL, new String[] {"manleo.rixen@gmail.com"});
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Movement Diagnose: " + spinner.getSelectedItem());
+        intent.putExtra(Intent.EXTRA_TEXT, "The movement data for " + spinner.getSelectedItem() + " is added as attachment.");
+
+
+        ArrayList<Uri> uris = new ArrayList<Uri>();
+
+        File directoryName = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+
+        for (String filename : fileNameArray_rightLeg) {
+            File file = new File(directoryName, filename);
+            if (!file.exists() || !file.canRead()) {
+                Toast.makeText(this, "Attachment Error", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Uri u = Uri.parse("file://" + file);
+            uris.add(u);
+        }
+
+
+        intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
         startActivity(Intent.createChooser(intent, "Send email..."));
     }
 

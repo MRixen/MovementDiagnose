@@ -100,7 +100,6 @@ public class CustomInputDialog extends Dialog {
 
         yesButton.setOnClickListener(okButtonListener);
         noButton.setOnClickListener(cancelButtonListener);
-
         this.show();
     }
 
