@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:layout_marginTop="5dp"
-        android:text="Sensor ID 1"/>
+        android:text="Sensor ID 0"/>
 
     <TextView
         android:id="@+id/ID_1_x_value"
@@ -54,7 +54,7 @@
         android:textStyle="bold"
         android:layout_marginTop="5dp"
         android:layout_alignParentRight="true"
-        android:text="Sensor ID 2"/>
+        android:text="Sensor ID 1"/>
 
     <TextView
         android:id="@+id/ID_2_x_value"
@@ -93,7 +93,7 @@
         android:textStyle="bold"
         android:layout_below="@id/ID_1_z_value"
         android:layout_marginTop="20dp"
-        android:text="Sensor ID 3"/>
+        android:text="Sensor ID 2"/>
 
     <TextView
         android:id="@+id/ID_3_x_value"
@@ -137,7 +137,7 @@
         android:layout_marginTop="20dp"
         android:layout_below="@id/ID_2_z_value"
         android:layout_alignParentRight="true"
-        android:text="Sensor ID 4"/>
+        android:text="Sensor ID 3"/>
 
     <TextView
         android:id="@+id/ID_4_x_value"
@@ -174,12 +174,12 @@
 
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:id="@+id/sendButton"
         android:text="Send"
         android:onClick="onSendButtonClicked"
-        android:layout_alignParentLeft="true"
+        android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"/>
 
     <Spinner
@@ -191,12 +191,20 @@
         android:layout_marginBottom="20dp"/>
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:id="@+id/startButton"
-        android:contentDescription="Test"
         android:text="Start"
         android:onClick="onStartButtonClick"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"/>
+
+    <Button
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/deleteButton"
+        android:text="Delete"
+        android:onClick="onDeleteButtonClick"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"/>
 </RelativeLayout>

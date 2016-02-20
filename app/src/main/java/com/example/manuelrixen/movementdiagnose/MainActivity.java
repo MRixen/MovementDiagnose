@@ -45,6 +45,9 @@ import static android.os.Process.myPid;
 
 public class MainActivity extends Activity implements Receiver.EventListener {
 
+    // TODO: Add same dialog as ABB Diagnose with possibility to start new measurement (delete old files at startup)
+
+    private static int CURRENT_MEASUREMENT_CONTEXT = -1;
     private final long maxActivityShowTime = 3000;
     private PowerManager.WakeLock wl;
     private TabHost tabHost;
@@ -80,6 +83,7 @@ public class MainActivity extends Activity implements Receiver.EventListener {
     private Spinner spinner;
     private String[] fileNameArray_rightLeg = new String[4];
     private int cntr = 0;
+    private boolean stopSendingFile = false;
 
 
     // TODO Check why zonenbahn-fehler isnt shown as event
@@ -150,8 +154,11 @@ public class MainActivity extends Activity implements Receiver.EventListener {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
                     if (parent.getSelectedItem().toString().equals(parent.getItemAtPosition(0))) {
+                        CURRENT_MEASUREMENT_CONTEXT = parent.getSelectedItemPosition();
                         for (int i = 1; i <= 4; i++) {
-                            fileNameArray_rightLeg[i - 1] = generateFilename(String.valueOf(i));
+                            fileNameArray_rightLeg[i - 1] = generateFilename(String.valueOf(i-1));
+                            // Create files at first to prevent attachment error
+                            createFile(fileNameArray_rightLeg[i-1]);
                             Log.d("fileNameArray_rightLeg[" + (i - 1) + "]", fileNameArray_rightLeg[i - 1]);
                         }
                     }
@@ -349,7 +356,7 @@ public class MainActivity extends Activity implements Receiver.EventListener {
     }
 
     private void showMessage(String msgType, String[] msg) {
-        if (msgType.equals("1")) {
+        if (msgType.equals("0")) {
             ID_1_x_textView.setText(getResources().getString(R.string.x_value) + " " + msg[0]);
             ID_1_y_textView.setText(getResources().getString(R.string.y_value) + " " + msg[1]);
             ID_1_z_textView.setText(getResources().getString(R.string.z_value) + " " + msg[2]);
@@ -357,7 +364,7 @@ public class MainActivity extends Activity implements Receiver.EventListener {
             if (!stopWritingToFile) writeToFile(fileNameArray_rightLeg[0], msgType + ";" + msg[0] + ";" + msg[1] + ";" + msg[2]);
         }
 
-        if (msgType.equals("2")){
+        if (msgType.equals("1")){
             ID_2_x_textView.setText(getResources().getString(R.string.x_value) + " " + msg[0]);
             ID_2_y_textView.setText(getResources().getString(R.string.y_value) + " " + msg[1]);
             ID_2_z_textView.setText(getResources().getString(R.string.z_value) + " " + msg[2]);
@@ -365,7 +372,7 @@ public class MainActivity extends Activity implements Receiver.EventListener {
             if (!stopWritingToFile) writeToFile(fileNameArray_rightLeg[1], msgType + ";" + msg[0] + ";" + msg[1] + ";" + msg[2]);
         }
 
-        if (msgType.equals("3")){
+        if (msgType.equals("2")){
             ID_3_x_textView.setText(getResources().getString(R.string.x_value) + " " + msg[0]);
             ID_3_y_textView.setText(getResources().getString(R.string.y_value) + " " + msg[1]);
             ID_3_z_textView.setText(getResources().getString(R.string.z_value) + " " + msg[2]);
@@ -373,7 +380,7 @@ public class MainActivity extends Activity implements Receiver.EventListener {
             if (!stopWritingToFile) writeToFile(fileNameArray_rightLeg[2], msgType + ";" + msg[0] + ";" + msg[1] + ";" + msg[2]);
         }
 
-        if (msgType.equals("4")){
+        if (msgType.equals("3")){
             ID_4_x_textView.setText(getResources().getString(R.string.x_value) + " " + msg[0]);
             ID_4_y_textView.setText(getResources().getString(R.string.y_value) + " " + msg[1]);
             ID_4_z_textView.setText(getResources().getString(R.string.z_value) + " " + msg[2]);
@@ -396,6 +403,33 @@ public class MainActivity extends Activity implements Receiver.EventListener {
             }
         }
         else Toast.makeText(getBaseContext(), "Select context from spinner!", Toast.LENGTH_SHORT).show();
+    }
+
+    private void createFile(String filename) {
+        // Create internal directory
+        File directoryName = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+
+        File file = new File(directoryName, filename);
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+                writing(file, "ID;X;Y;Z");
+            }
+        } catch (IOException e) {
+            Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void deleteFiles(String filename) {
+        // Create internal directory
+        File directoryName = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+
+        File file = new File(directoryName, filename);
+        try {
+            if (!file.exists()) file.createNewFile();
+        } catch (IOException e) {
+            Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
 
     private void writeToFile(String filename, String data) {
@@ -444,7 +478,7 @@ public class MainActivity extends Activity implements Receiver.EventListener {
 
     public void onSendButtonClicked(View view) {
         stopWritingToFile = true;
-        sendMultipleAttachments();
+        if (!stopSendingFile) sendMultipleAttachments();
         stopWritingToFile= false;
     }
 
@@ -493,4 +527,28 @@ public class MainActivity extends Activity implements Receiver.EventListener {
         startActivity(Intent.createChooser(intent, "Send email..."));
     }
 
+    public void onDeleteButtonClick(View view) {
+        stopSendingFile = true;
+        try {
+            switch (CURRENT_MEASUREMENT_CONTEXT) {
+                case 0:
+                    // Context zero is active (right leg)
+                    for (int i = 1; i <= 4; i++) {
+                        // Delete all files
+                        deleteFiles(fileNameArray_rightLeg[i - 1]);
+                    }
+                    break;
+                case 1:
+                    // Context one is active
+                    break;
+                default:
+                    Log.d("onDeleteButtonClick", "No measurement context available");
+                    break;
+            }
+        }
+        catch(NullPointerException e){
+            Log.d("onDeleteButtonClick", "Exception thrown: " + e);
+        }
+        stopSendingFile = false;
+    }
 }
